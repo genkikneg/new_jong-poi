@@ -1,0 +1,96 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "jong-poi-next",
+	"main": "./src/worker/index.ts",
+	"compatibility_date": "2025-10-08",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"upload_source_maps": true,
+	"assets": {
+		"directory": "./dist/client",
+		"not_found_handling": "single-page-application",
+		"run_worker_first": [
+			"/api/*",
+			"/ws/*"
+		]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "jong-poi-production",
+			"database_id": "d64d9753-d53d-4455-b727-806fe1400b04",
+			"migrations_dir": "migrations"
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "SESSION_ROOM",
+				"class_name": "SessionRoom"
+			}
+		]
+	},
+	"exports": {
+		"SessionRoom": {
+			"type": "durable-object",
+			"storage": "sqlite"
+		}
+	},
+	"vars": {
+		"WEBAUTHN_RP_ID": "jong-poi.misoon.net",
+		"WEBAUTHN_ORIGIN": "https://jong-poi.misoon.net"
+	},
+	"env": {
+		"staging": {
+			"name": "jong-poi-next-staging",
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "jong-poi-migration-validation",
+					"database_id": "f5185f09-5acb-4ee7-a298-eeb5db36852a",
+					"migrations_dir": "migrations"
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "SESSION_ROOM",
+						"class_name": "SessionRoom"
+					}
+				]
+			},
+			"vars": {
+				"WEBAUTHN_RP_ID": "jong-poi-next.misoon.net",
+				"WEBAUTHN_ORIGIN": "https://jong-poi-next.misoon.net"
+			}
+		}
+	}
+	/**
+	 * Smart Placement
+	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
+	 */
+	// "placement": {  "mode": "smart" }
+	/**
+	 * Bindings
+	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
+	 * databases, object storage, AI inference, real-time communication and more.
+	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
+	 */
+	/**
+	 * Environment Variables
+	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
+	 * Note: Use secrets to store sensitive data.
+	 * https://developers.cloudflare.com/workers/configuration/secrets/
+	 */
+	// "vars": {  "MY_VARIABLE": "production_value" }
+	/**
+	 * Service Bindings (communicate between multiple Workers)
+	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
+	 */
+	// "services": [  {   "binding": "MY_SERVICE",   "service": "my-service"  } ]
+}
